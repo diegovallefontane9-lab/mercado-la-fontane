@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercado La Fontane – Guásimas, Cuba</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --cream: #eef4f0;
+  --dark: #0d2b1e;
+  --accent: #1a5c8a;
+  --green: #2e9e6b;
+  --light: #f0f7f3;
+  --card: #ffffff;
+  --border: #c8dfd4;
+  --star: #f5a623;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
+
+/* HEADER */
+header { background:var(--dark); position:sticky; top:0; z-index:100; box-shadow:0 2px 20px rgba(0,0,0,0.3); }
+.header-inner { max-width:1100px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+.logo { display:flex; flex-direction:column; line-height:1; }
+.logo-main { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:#4ecfa0; }
+.logo-sub { font-size:0.65rem; color:#888; letter-spacing:3px; text-transform:uppercase; margin-top:2px; }
+.admin-btn { background:transparent; border:none; color:#555; font-size:0.75rem; cursor:pointer; font-family:'DM Sans',sans-serif; opacity:0.4; transition:opacity 0.2s; padding:6px 10px; letter-spacing:2px; }
+.admin-btn:hover { opacity:1; color:#4ecfa0; }
+
+/* HERO */
+.hero { background:var(--dark); padding:60px 24px 50px; text-align:center; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at center, rgba(46,158,107,0.1) 0%, transparent 60%); pointer-events:none; }
+.hero-tag { display:inline-block; background:rgba(46,158,107,0.15); color:#4ecfa0; font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; padding:6px 16px; border-radius:20px; border:1px solid rgba(46,158,107,0.3); margin-bottom:20px; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.5rem); color:#fff; font-weight:700; line-height:1.1; margin-bottom:14px; }
+.hero h1 span { color:#4ecfa0; }
+.hero p { color:#999; font-size:0.95rem; max-width:400px; margin:0 auto; line-height:1.6; }
+
+/* BANNERS */
+.banners-section { max-width:1100px; margin:28px auto 0; padding:0 24px; display:flex; flex-direction:column; gap:10px; }
+.banner-item { border-radius:12px; padding:16px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.banner-texto { font-weight:600; font-size:0.95rem; color:#fff; flex:1; }
+.banner-vence { font-size:0.72rem; color:rgba(255,255,255,0.7); white-space:nowrap; }
+
+/* FILTROS */
+.filters { max-width:1100px; margin:28px auto 0; padding:0 24px; display:flex; gap:10px; flex-wrap:wrap; }
+.filter-btn { background:var(--card); border:1.5px solid var(--border); color:var(--dark); padding:8px 18px; border-radius:30px; font-size:0.82rem; font-weight:500; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+.filter-btn:hover, .filter-btn.active { background:var(--dark); border-color:var(--dark); color:#4ecfa0; }
+
+/* GALERÍA */
+.gallery-section { max-width:1100px; margin:32px auto 0; padding:0 24px; }
+.gallery-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--dark); margin-bottom:18px; }
+.gallery-title span { display:block; font-family:'DM Sans',sans-serif; font-size:0.75rem; color:#aaa; font-weight:400; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.gallery-grid { display:grid; grid-template-columns:2fr 1fr 1fr; grid-template-rows:200px 200px; gap:10px; border-radius:16px; overflow:hidden; }
+.gallery-item { position:relative; overflow:hidden; background:linear-gradient(135deg,#d4ede2,#c0dfd2); cursor:pointer; }
+.gallery-item:first-child { grid-row:1/3; }
+.gallery-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s; }
+.gallery-item:hover img { transform:scale(1.05); }
+.gallery-placeholder { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:#8ab8a4; font-size:0.78rem; }
+.gallery-placeholder .ph-icon { font-size:2rem; opacity:0.6; }
+.gallery-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.5),transparent 50%); opacity:0; transition:opacity 0.3s; display:flex; align-items:flex-end; padding:14px; }
+.gallery-item:hover .gallery-overlay { opacity:1; }
+.gallery-overlay-text { color:#fff; font-size:0.78rem; font-weight:500; }
+
+/* CATÁLOGO */
+.catalog { max-width:1100px; margin:28px auto 0; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; }
+.product-card { background:var(--card); border-radius:14px; overflow:hidden; border:1px solid var(--border); transition:transform 0.2s,box-shadow 0.2s; }
+.product-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,0.1); }
+.card-img { width:100%; height:180px; background:linear-gradient(135deg,#d4ede2,#c0dfd2); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+.card-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.card-img .emoji-placeholder { font-size:3.5rem; }
+.card-category { position:absolute; top:10px; left:10px; background:var(--dark); color:#4ecfa0; font-size:0.62rem; letter-spacing:1.5px; text-transform:uppercase; padding:4px 10px; border-radius:20px; }
+.card-body { padding:16px; }
+.card-name { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--dark); margin-bottom:6px; line-height:1.3; }
+.card-desc { font-size:0.8rem; color:#888; line-height:1.5; margin-bottom:14px; }
+.card-footer { display:flex; align-items:center; justify-content:space-between; }
+.card-price { font-size:1.15rem; font-weight:700; color:var(--accent); }
+.card-price span { font-size:0.7rem; color:#aaa; font-weight:400; margin-left:3px; }
+.card-available { font-size:0.7rem; color:#2e9e6b; background:#e8f5ef; padding:3px 10px; border-radius:20px; }
+.card-available.no { color:#c0522a; background:#fdf0ec; }
+.wa-share { background:#25D366; color:#fff; border:none; border-radius:6px; padding:7px 12px; font-size:0.75rem; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; gap:5px; transition:opacity 0.2s; margin-top:12px; width:100%; justify-content:center; }
+.wa-share:hover { opacity:0.85; }
+
+/* RESEÑAS */
+.reviews-section { max-width:1100px; margin:50px auto 0; padding:0 24px; }
+.section-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--dark); margin-bottom:6px; }
+.section-title span { display:block; font-family:'DM Sans',sans-serif; font-size:0.75rem; color:#aaa; font-weight:400; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.reviews-summary { display:flex; align-items:center; gap:16px; margin-bottom:24px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; }
+.reviews-avg { font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:900; color:var(--dark); }
+.reviews-stars { color:var(--star); font-size:1.2rem; }
+.reviews-count { font-size:0.8rem; color:#aaa; }
+.reviews-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:30px; }
+.review-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+.review-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.review-name { font-weight:600; font-size:0.9rem; color:var(--dark); }
+.review-stars { color:var(--star); font-size:0.9rem; }
+.review-comment { font-size:0.83rem; color:#666; line-height:1.5; }
+.review-date { font-size:0.72rem; color:#bbb; margin-top:8px; }
+.add-review { background:var(--card); border:1.5px solid var(--border); border-radius:14px; padding:24px; margin-top:10px; }
+.add-review h3 { font-family:'Playfair Display',serif; font-size:1.1rem; margin-bottom:16px; color:var(--dark); }
+.star-select { display:flex; gap:8px; margin-bottom:14px; }
+.star-select span { font-size:1.6rem; cursor:pointer; color:#ddd; transition:color 0.15s; }
+.star-select span.active { color:var(--star); }
+
+/* QR */
+.qr-section { max-width:1100px; margin:50px auto 0; padding:0 24px 60px; text-align:center; }
+.qr-inner { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:36px 24px; display:inline-block; }
+.qr-inner strong { display:block; font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--dark); margin-bottom:16px; }
+.qr-inner p { font-size:0.82rem; color:#aaa; margin-top:14px; }
+#qrcode { display:flex; justify-content:center; }
+.btn-print { margin-top:16px; background:var(--dark); color:#4ecfa0; border:none; padding:10px 24px; border-radius:8px; font-size:0.85rem; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+/* FOOTER */
+footer { background:var(--dark); color:#666; text-align:center; padding:30px 24px; font-size:0.8rem; line-height:1.8; }
+footer strong { color:#4ecfa0; }
+
+/* WA FLOAT */
+.wa-float { position:fixed; bottom:24px; right:24px; z-index:200; background:#25D366; color:#fff; border:none; border-radius:50px; padding:14px 20px; font-size:0.88rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow:0 4px 20px rgba(37,211,102,0.4); text-decoration:none; font-family:'DM Sans',sans-serif; transition:transform 0.2s; }
+.wa-float:hover { transform:translateY(-2px); }
+
+/* FORMS */
+.form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.form-group label { font-size:0.78rem; font-weight:500; color:#555; letter-spacing:0.5px; }
+.form-group input, .form-group select, .form-group textarea { border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; font-size:0.9rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; color:var(--dark); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--green); }
+.form-group textarea { resize:vertical; min-height:80px; }
+.btn-primary { background:var(--dark); color:#4ecfa0; border:none; padding:12px 24px; border-radius:8px; font-size:0.88rem; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity 0.2s; }
+.btn-primary:hover { opacity:0.85; }
+.btn-danger { background:#fdf0ec; color:#c0522a; border:1px solid #f0c4b4; padding:7px 14px; border-radius:6px; font-size:0.78rem; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.btn-edit { background:#f0f4ff; color:#3355cc; border:1px solid #c4cef0; padding:7px 14px; border-radius:6px; font-size:0.78rem; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+/* MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:18px; width:100%; max-width:680px; max-height:90vh; overflow-y:auto; padding:32px; position:relative; }
+.modal-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--dark); margin-bottom:6px; }
+.modal-sub { font-size:0.82rem; color:#999; margin-bottom:28px; }
+.close-modal { position:absolute; top:20px; right:20px; background:#f0f0f0; border:none; width:34px; height:34px; border-radius:50%; font-size:1rem; cursor:pointer; }
+.admin-tabs { display:flex; gap:6px; margin-bottom:24px; border-bottom:2px solid var(--border); flex-wrap:wrap; }
+.tab-btn { background:none; border:none; padding:10px 12px; font-size:0.8rem; font-weight:500; cursor:pointer; color:#999; border-bottom:2px solid transparent; margin-bottom:-2px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.tab-btn.active { color:var(--dark); border-bottom-color:var(--green); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.admin-product-list { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+.admin-product-item { display:flex; align-items:center; gap:14px; padding:12px 16px; background:var(--light); border-radius:10px; border:1px solid var(--border); }
+.admin-product-item .item-emoji { font-size:1.8rem; }
+.admin-product-item .item-info { flex:1; }
+.admin-product-item .item-name { font-weight:600; font-size:0.9rem; color:var(--dark); }
+.admin-product-item .item-cat { font-size:0.75rem; color:#999; }
+.admin-product-item .item-actions { display:flex; gap:8px; }
+.add-product-form { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
+.add-product-form .full { grid-column:1/-1; }
+.img-preview { width:100%; height:120px; object-fit:cover; border-radius:8px; border:1.5px solid var(--border); display:none; margin-top:8px; }
+.error-msg { color:#c0522a; font-size:0.82rem; margin-top:8px; display:none; }
+.admin-gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+.admin-gallery-item { position:relative; border-radius:8px; overflow:hidden; height:90px; background:var(--light); border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.5rem; color:#ccc; }
+.admin-gallery-item img { width:100%; height:100%; object-fit:cover; }
+.admin-gallery-item .remove-img { position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:0.7rem; cursor:pointer; display:none; align-items:center; justify-content:center; }
+.admin-gallery-item:hover .remove-img { display:flex; }
+.banner-admin-list { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+.banner-admin-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:10px; border:1px solid var(--border); }
+.banner-admin-item .b-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.banner-admin-item .b-info { flex:1; font-size:0.88rem; color:var(--dark); }
+.banner-admin-item .b-vence { font-size:0.72rem; color:#aaa; }
+.color-input { width:48px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px; }
+.loading { text-align:center; padding:40px; color:#aaa; font-size:0.9rem; grid-column:1/-1; }
+
+/* LIGHTBOX */
+.lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:500; align-items:center; justify-content:center; }
+.lightbox.open { display:flex; }
+.lightbox img { max-width:90vw; max-height:85vh; border-radius:10px; object-fit:contain; }
+.lightbox-close { position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer; }
+
+@media print {
+  body > *:not(.qr-section) { display:none; }
+  .qr-section { display:block !important; margin:0; padding:40px; }
+  .btn-print { display:none; }
+}
+@media (max-width:600px) {
+  .gallery-grid { grid-template-columns:1fr 1fr; grid-template-rows:160px 160px 160px; }
+  .gallery-item:first-child { grid-row:1; grid-column:1/3; }
+  .catalog { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
+  .card-img { height:140px; }
+  .add-product-form { grid-template-columns:1fr; }
+  .add-product-form .full { grid-column:1; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-main">La Fontane</span>
+      <span class="logo-sub">Guásimas · Cuba</span>
+    </div>
+    <button class="admin-btn" onclick="openAdmin()">···</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">📍 Calle Caimán, Guásimas</div>
+  <h1>Mercado<br><span>La Fontane</span></h1>
+  <p>Productos frescos y variados para el hogar. Consulta disponibilidad y precios actualizados.</p>
+</div>
+
+<div class="banners-section" id="bannersSection"></div>
+
+<div class="filters" id="filters"></div>
+
+<div class="gallery-section">
+  <div class="gallery-title"><span>📸 Así somos</span>Nuestro Mercado</div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<div class="catalog" id="catalog"><div class="loading">Cargando productos...</div></div>
+
+<div class="reviews-section">
+  <div class="section-title"><span>⭐ Opiniones</span>Lo que dicen nuestros clientes</div>
+  <div class="reviews-summary" id="reviewsSummary" style="display:none">
+    <div class="reviews-avg" id="reviewsAvg">0</div>
+    <div>
+      <div class="reviews-stars" id="reviewsStars">☆☆☆☆☆</div>
+      <div class="reviews-count" id="reviewsCount">0 reseñas</div>
+    </div>
+  </div>
+  <div class="reviews-grid" id="reviewsGrid"></div>
+  <div class="add-review">
+    <h3>Deja tu opinión</h3>
+    <div class="star-select" id="starSelect">
+      <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+    </div>
+    <div class="form-group"><label>TU NOMBRE (opcional)</label><input type="text" id="reviewName" placeholder="Ej: María"></div>
+    <div class="form-group"><label>COMENTARIO</label><textarea id="reviewComment" placeholder="¿Qué te pareció el mercado?"></textarea></div>
+    <button class="btn-primary" onclick="submitReview()">Enviar reseña</button>
+    <div class="error-msg" id="reviewError"></div>
+  </div>
+</div>
+
+<div class="qr-section">
+  <div class="qr-inner">
+    <strong>📲 Comparte el catálogo</strong>
+    <div id="qrcode"></div>
+    <p>mercado-la-fontane.pages.dev</p>
+    <button class="btn-print" onclick="window.print()">🖨 Imprimir QR</button>
+  </div>
+</div>
+
+<footer>
+  <strong>Mercado La Fontane</strong><br>
+  Calle Caimán · Guásimas, Cuba<br>
+  Precios en CUP · Sujetos a disponibilidad
+</footer>
+
+<a class="wa-float" href="https://wa.me/5359382320" target="_blank">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.859L.057 23.428a.75.75 0 0 0 .915.915l5.569-1.475A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.713 9.713 0 0 1-4.953-1.355l-.355-.211-3.664.97.983-3.595-.23-.368A9.718 9.718 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
+  Escríbenos
+</a>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div id="loginView">
+      <button class="close-modal" onclick="closeAdmin()">✕</button>
+      <div class="modal-title">Administración</div>
+      <div class="modal-sub">Acceso restringido.</div>
+      <div class="form-group"><label>CONTRASEÑA</label><input type="password" id="pwInput" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="error-msg" id="loginError">Contraseña incorrecta.</div>
+      <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    </div>
+    <div id="adminView" style="display:none">
+      <button class="close-modal" onclick="closeAdmin()">✕</button>
+      <div class="modal-title">Panel Admin</div>
+      <div class="modal-sub">Gestiona el catálogo.</div>
+      <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchTab('list',this)">📋 Productos</button>
+        <button class="tab-btn" onclick="switchTab('add',this)">➕ Agregar</button>
+        <button class="tab-btn" onclick="switchTab('banners',this)">🏷 Banners</button>
+        <button class="tab-btn" onclick="switchTab('gallery',this)">📸 Galería</button>
+        <button class="tab-btn" onclick="switchTab('settings',this)">🔑 Clave</button>
+      </div>
+
+      <div class="tab-content active" id="tab-list">
+        <div class="admin-product-list" id="adminList"></div>
+      </div>
+
+      <div class="tab-content" id="tab-add">
+        <div class="add-product-form">
+          <div class="form-group full"><label>NOMBRE</label><input type="text" id="newName" placeholder="Ej: Jabón de baño"></div>
+          <div class="form-group"><label>CATEGORÍA</label>
+            <select id="newCat">
+              <option value="aseo">🧴 Aseo</option>
+              <option value="enlatados">🥫 Enlatados</option>
+              <option value="refrescos">🥤 Refrescos</option>
+              <option value="bebidas">🍶 Bebidas</option>
+              <option value="confituras">🍬 Confituras</option>
+              <option value="gym">💪 Gym</option>
+            </select>
+          </div>
+          <div class="form-group"><label>PRECIO (CUP)</label><input type="number" id="newPrice" placeholder="150"></div>
+          <div class="form-group full"><label>DESCRIPCIÓN</label><textarea id="newDesc" placeholder="Descripción breve..."></textarea></div>
+          <div class="form-group full"><label>FOTO (opcional)</label><input type="file" id="newImg" accept="image/*" onchange="previewImg()"><img id="imgPreview" class="img-preview"></div>
+          <div class="form-group"><label>DISPONIBLE</label><select id="newAvail"><option value="true">✅ Sí</option><option value="false">❌ No</option></select></div>
+          <div class="full"><button class="btn-primary" id="saveBtn" onclick="addProduct()" style="width:100%">Guardar producto</button></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-banners">
+        <div class="banner-admin-list" id="bannerAdminList"></div>
+        <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
+          <p style="font-size:0.85rem;font-weight:600;margin-bottom:14px">Nuevo banner</p>
+          <div class="form-group"><label>TEXTO DE LA OFERTA</label><input type="text" id="bTexto" placeholder="Ej: 20% de descuento en aseo este fin de semana"></div>
+          <div class="form-group"><label>COLOR</label><input type="color" id="bColor" class="color-input" value="#1a5c8a"></div>
+          <div class="form-group"><label>VENCE (opcional)</label><input type="date" id="bVence"></div>
+          <button class="btn-primary" onclick="addBanner()" style="width:100%">Publicar banner</button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-gallery">
+        <p style="font-size:0.85rem;color:#888;margin-top:4px">Sube hasta 5 fotos del mercado.</p>
+        <div class="admin-gallery-grid" id="adminGalleryGrid"></div>
+        <button class="btn-primary" style="margin-top:16px;width:100%" onclick="saveGallery()">Guardar galería</button>
+      </div>
+
+      <div class="tab-content" id="tab-settings">
+        <div style="margin-top:16px">
+          <div class="form-group"><label>CONTRASEÑA ACTUAL</label><input type="password" id="pwOld"></div>
+          <div class="form-group"><label>NUEVA CONTRASEÑA</label><input type="password" id="pwNew"></div>
+          <div class="form-group"><label>CONFIRMAR</label><input type="password" id="pwNew2"></div>
+          <div class="error-msg" id="pwError"></div>
+          <button class="btn-primary" onclick="changePassword()">Cambiar contraseña</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://oimzynthjxmywlefxifw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pbXp5bnRoanhteXdsZWZ4aWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDY3MzUsImV4cCI6MjA5MDQ4MjczNX0.RMfWAsaE4KK-MN3uizfmDBmABCshE7orEsMkMst2ruQ';
+
+async function sb(path, opts={}) {
+  const r = await fetch(SB_URL+'/rest/v1/'+path, {
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+
+const catEmoji = {aseo:'🧴',enlatados:'🥫',refrescos:'🥤',bebidas:'🍶',confituras:'🍬',gym:'💪'};
+const catLabel = {aseo:'Aseo',enlatados:'Enlatados',refrescos:'Refrescos',bebidas:'Bebidas',confituras:'Confituras',gym:'Gym'};
+const GALLERY_KEY = 'fontane_gallery';
+const PW_KEY = 'fontane_pw';
+const GALLERY_LABELS = ['Atendiendo clientes','Nuestros productos','El local','Variedad del día','Equipo La Fontane'];
+const GALLERY_PH = [{icon:'🏪',label:'El local'},{icon:'🛒',label:'Productos'},{icon:'👐',label:'Atendiendo'},{icon:'📦',label:'Variedad'},{icon:'✨',label:'Novedades'}];
+
+let activeFilter = 'todos';
+let editingId = null;
+let selectedStars = 0;
+
+function getPassword() { return localStorage.getItem(PW_KEY)||'ludmila80'; }
+function getGallery() { const r=localStorage.getItem(GALLERY_KEY); return r?JSON.parse(r):[]; }
+
+// PRODUCTOS
+async function loadProducts() {
+  try {
+    let url = 'products?order=id';
+    if (activeFilter!=='todos') url+='&cat=eq.'+activeFilter;
+    const products = await sb(url);
+    renderProducts(products||[]);
+    renderFilters(products||[]);
+  } catch(e) {
+    document.getElementById('catalog').innerHTML='<div class="loading">Error cargando productos.</div>';
+  }
+}
+
+function renderProducts(products) {
+  const catalog = document.getElementById('catalog');
+  catalog.innerHTML='';
+  if (!products.length) { catalog.innerHTML='<p style="color:#aaa;font-size:0.9rem;grid-column:1/-1;text-align:center;padding:40px 0">No hay productos aún.</p>'; return; }
+  products.forEach(p => {
+    const card = document.createElement('div');
+    card.className='product-card';
+    card.innerHTML=`
+      <div class="card-img">
+        ${p.img?`<img src="${p.img}" alt="${p.name}">`:`<span class="emoji-placeholder">${catEmoji[p.cat]||'📦'}</span>`}
+        <span class="card-category">${catLabel[p.cat]||p.cat}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.description||''}</div>
+        <div class="card-footer">
+          <div class="card-price">${p.price.toLocaleString('es-CU')}<span>CUP</span></div>
+          <span class="card-available ${!p.available?'no':''}">${p.available?'Disponible':'Agotado'}</span>
+        </div>
+        <button class="wa-share" onclick="shareWA('${p.name.replace(/'/g,"\\'")}',${p.price},${p.available})">📲 Consultar por WhatsApp</button>
+      </div>`;
+    catalog.appendChild(card);
+  });
+}
+
+function renderFilters(products) {
+  const cats=[...new Set(products.map(p=>p.cat))];
+  const container=document.getElementById('filters');
+  container.innerHTML='';
+  const all=document.createElement('button');
+  all.className='filter-btn'+(activeFilter==='todos'?' active':'');
+  all.textContent='🛒 Todos';
+  all.onclick=()=>{activeFilter='todos';loadProducts();setActive(all);};
+  container.appendChild(all);
+  cats.forEach(cat=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn'+(activeFilter===cat?' active':'');
+    btn.textContent=`${catEmoji[cat]||'📦'} ${catLabel[cat]||cat}`;
+    btn.onclick=()=>{activeFilter=cat;loadProducts();setActive(btn);};
+    container.appendChild(btn);
+  });
+}
+
+function setActive(btn) { document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+
+// BANNERS
+async function loadBanners() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const banners = await sb('banners?activo=eq.true&order=id');
+    const section = document.getElementById('bannersSection');
+    section.innerHTML='';
+    if (!banners||!banners.length) return;
+    banners.forEach(b=>{
+      if (b.vence && b.vence < today) return;
+      const div=document.createElement('div');
+      div.className='banner-item';
+      div.style.background=b.color||'#1a5c8a';
+      const venceStr=b.vence?` · Hasta ${new Date(b.vence+'T12:00:00').toLocaleDateString('es-CU',{day:'numeric',month:'short'})}`:'';
+      div.innerHTML=`<span class="banner-texto">🏷 ${b.texto}</span><span class="banner-vence">${venceStr}</span>`;
+      section.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+async function loadAdminBanners() {
+  const banners = await sb('banners?order=id.desc');
+  const list = document.getElementById('bannerAdminList');
+  list.innerHTML='';
+  if (!banners||!banners.length) { list.innerHTML='<p style="color:#aaa;font-size:0.85rem">No hay banners aún.</p>'; return; }
+  banners.forEach(b=>{
+    const item=document.createElement('div');
+    item.className='banner-admin-item';
+    item.innerHTML=`
+      <span class="b-dot" style="background:${b.color||'#1a5c8a'}"></span>
+      <div class="b-info">${b.texto}<div class="b-vence">${b.vence?'Vence: '+b.vence:''} · ${b.activo?'Activo':'Inactivo'}</div></div>
+      <button class="btn-danger" onclick="deleteBanner(${b.id})">Borrar</button>`;
+    list.appendChild(item);
+  });
+}
+
+async function addBanner() {
+  const texto=document.getElementById('bTexto').value.trim();
+  if (!texto) { alert('Escribe el texto del banner.'); return; }
+  const data={texto, color:document.getElementById('bColor').value, activo:true};
+  const vence=document.getElementById('bVence').value;
+  if (vence) data.vence=vence;
+  await sb('banners',{method:'POST',body:JSON.stringify(data)});
+  document.getElementById('bTexto').value='';
+  document.getElementById('bVence').value='';
+  loadAdminBanners(); loadBanners();
+}
+
+async function deleteBanner(id) {
+  if (!confirm('¿Eliminar este banner?')) return;
+  await sb('banners?id=eq.'+id,{method:'DELETE'});
+  loadAdminBanners(); loadBanners();
+}
+
+// GALERÍA
+function renderGallery() {
+  const photos=getGallery();
+  const grid=document.getElementById('galleryGrid');
+  grid.innerHTML='';
+  for (let i=0;i<5;i++) {
+    const item=document.createElement('div');
+    item.className='gallery-item';
+    if (i===0) item.style.gridRow='1/3';
+    if (photos[i]) {
+      item.innerHTML=`<img src="${photos[i]}" alt="Foto ${i+1}" onclick="openLightbox('${photos[i]}')"><div class="gallery-overlay"><span class="gallery-overlay-text">${GALLERY_LABELS[i]}</span></div>`;
+    } else {
+      item.innerHTML=`<div class="gallery-placeholder"><span class="ph-icon">${GALLERY_PH[i].icon}</span><span>${GALLERY_PH[i].label}</span></div>`;
+    }
+    grid.appendChild(item);
+  }
+}
+
+function renderAdminGallery() {
+  const photos=getGallery();
+  const grid=document.getElementById('adminGalleryGrid');
+  grid.innerHTML='';
+  for (let i=0;i<5;i++) {
+    const item=document.createElement('div');
+    item.className='admin-gallery-item';
+    if (photos[i]) {
+      item.innerHTML=`<img src="${photos[i]}"><button class="remove-img" onclick="removeGalleryPhoto(${i})">✕</button>`;
+    } else {
+      item.innerHTML='<span>＋</span>';
+      item.onclick=()=>pickGalleryPhoto(i);
+    }
+    grid.appendChild(item);
+  }
+}
+
+function pickGalleryPhoto(index) {
+  const input=document.createElement('input');
+  input.type='file'; input.accept='image/*';
+  input.onchange=e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const photos=getGallery();
+      photos[index]=ev.target.result;
+      localStorage.setItem(GALLERY_KEY,JSON.stringify(photos));
+      renderAdminGallery(); renderGallery();
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function removeGalleryPhoto(index) {
+  const photos=getGallery();
+  photos.splice(index,1);
+  localStorage.setItem(GALLERY_KEY,JSON.stringify(photos));
+  renderAdminGallery(); renderGallery();
+}
+
+function saveGallery() { renderGallery(); alert('✅ Galería guardada.'); }
+function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLightbox();});
+
+// RESEÑAS
+document.querySelectorAll('#starSelect span').forEach(s=>{
+  s.addEventListener('click',()=>{
+    selectedStars=parseInt(s.dataset.v);
+    document.querySelectorAll('#starSelect span').forEach((x,i)=>x.classList.toggle('active',i<selectedStars));
+  });
+});
+
+async function loadReviews() {
+  try {
+    const reviews=await sb('reviews?order=created_at.desc&limit=20');
+    if (!reviews||!reviews.length) return;
+    document.getElementById('reviewsSummary').style.display='flex';
+    const avg=(reviews.reduce((a,r)=>a+r.stars,0)/reviews.length).toFixed(1);
+    document.getElementById('reviewsAvg').textContent=avg;
+    document.getElementById('reviewsStars').textContent='★'.repeat(Math.round(avg))+'☆'.repeat(5-Math.round(avg));
+    document.getElementById('reviewsCount').textContent=reviews.length+' reseña'+(reviews.length!==1?'s':'');
+    const grid=document.getElementById('reviewsGrid');
+    grid.innerHTML='';
+    reviews.forEach(r=>{
+      const card=document.createElement('div');
+      card.className='review-card';
+      const date=new Date(r.created_at).toLocaleDateString('es-CU',{day:'numeric',month:'short',year:'numeric'});
+      card.innerHTML=`<div class="review-header"><span class="review-name">${r.name||'Cliente'}</span><span class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span></div><div class="review-comment">${r.comment||''}</div><div class="review-date">${date}</div>`;
+      grid.appendChild(card);
+    });
+  } catch(e) {}
+}
+
+async function submitReview() {
+  const err=document.getElementById('reviewError');
+  if (!selectedStars) { err.textContent='Selecciona una calificación.'; err.style.display='block'; return; }
+  const comment=document.getElementById('reviewComment').value.trim();
+  if (!comment) { err.textContent='Escribe un comentario.'; err.style.display='block'; return; }
+  err.style.display='none';
+  try {
+    await sb('reviews',{method:'POST',body:JSON.stringify({name:document.getElementById('reviewName').value.trim()||'Cliente',stars:selectedStars,comment})});
+    document.getElementById('reviewName').value='';
+    document.getElementById('reviewComment').value='';
+    selectedStars=0;
+    document.querySelectorAll('#starSelect span').forEach(x=>x.classList.remove('active'));
+    alert('✅ ¡Gracias por tu reseña!');
+    loadReviews();
+  } catch(e) { err.textContent='Error al enviar.'; err.style.display='block'; }
+}
+
+// ADMIN
+function openAdmin() { document.getElementById('modalOverlay').classList.add('open'); document.getElementById('loginView').style.display='block'; document.getElementById('adminView').style.display='none'; document.getElementById('loginError').style.display='none'; document.getElementById('pwInput').value=''; }
+function closeAdmin() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function doLogin() {
+  if (document.getElementById('pwInput').value===getPassword()) {
+    document.getElementById('loginView').style.display='none';
+    document.getElementById('adminView').style.display='block';
+    loadAdminList();
+  } else { document.getElementById('loginError').style.display='block'; }
+}
+
+function switchTab(name,btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='list') loadAdminList();
+  if(name==='banners') loadAdminBanners();
+  if(name==='gallery') renderAdminGallery();
+}
+
+async function loadAdminList() {
+  const products=await sb('products?order=id');
+  const list=document.getElementById('adminList');
+  list.innerHTML='';
+  if (!products||!products.length) { list.innerHTML='<p style="color:#aaa;font-size:0.85rem">No hay productos aún. Agrega desde ➕</p>'; return; }
+  products.forEach(p=>{
+    const item=document.createElement('div');
+    item.className='admin-product-item';
+    item.innerHTML=`<span class="item-emoji">${catEmoji[p.cat]||'📦'}</span><div class="item-info"><div class="item-name">${p.name} — ${p.price.toLocaleString('es-CU')} CUP</div><div class="item-cat">${catLabel[p.cat]||p.cat} · ${p.available?'✅ Disponible':'❌ Agotado'}</div></div><div class="item-actions"><button class="btn-edit" onclick="editProduct(${p.id})">Editar</button><button class="btn-danger" onclick="deleteProduct(${p.id})">Borrar</button></div>`;
+    list.appendChild(item);
+  });
+}
+
+async function deleteProduct(id) {
+  if (!confirm('¿Eliminar?')) return;
+  await sb('products?id=eq.'+id,{method:'DELETE'});
+  loadAdminList(); loadProducts();
+}
+
+async function editProduct(id) {
+  const products=await sb('products?id=eq.'+id);
+  const p=products[0]; if(!p) return;
+  editingId=id;
+  document.getElementById('newName').value=p.name;
+  document.getElementById('newCat').value=p.cat;
+  document.getElementById('newPrice').value=p.price;
+  document.getElementById('newDesc').value=p.description||'';
+  document.getElementById('newAvail').value=String(p.available);
+  if(p.img){const prev=document.getElementById('imgPreview');prev.src=p.img;prev.style.display='block';}
+  document.getElementById('saveBtn').textContent='Actualizar producto';
+  switchTab('add',document.querySelectorAll('.tab-btn')[1]);
+}
+
+function previewImg() {
+  const file=document.getElementById('newImg').files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{const prev=document.getElementById('imgPreview');prev.src=e.target.result;prev.style.display='block';};
+  reader.readAsDataURL(file);
+}
+
+async function addProduct() {
+  const name=document.getElementById('newName').value.trim();
+  const price=parseInt(document.getElementById('newPrice').value);
+  if(!name||isNaN(price)){alert('Completa nombre y precio.');return;}
+  const prev=document.getElementById('imgPreview');
+  const data={name,cat:document.getElementById('newCat').value,price,description:document.getElementById('newDesc').value.trim(),available:document.getElementById('newAvail').value==='true',img:prev.src.startsWith('data:')?prev.src:''};
+  if(editingId){
+    await sb('products?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify(data)});
+    editingId=null; document.getElementById('saveBtn').textContent='Guardar producto';
+  } else {
+    await sb('products',{method:'POST',body:JSON.stringify(data)});
+  }
+  document.getElementById('newName').value=''; document.getElementById('newPrice').value=''; document.getElementById('newDesc').value=''; document.getElementById('newImg').value=''; prev.style.display='none';
+  loadAdminList(); loadProducts();
+  switchTab('list',document.querySelectorAll('.tab-btn')[0]);
+}
+
+function changePassword() {
+  const old=document.getElementById('pwOld').value,n1=document.getElementById('pwNew').value,n2=document.getElementById('pwNew2').value;
+  const err=document.getElementById('pwError');
+  if(old!==getPassword()){err.textContent='Contraseña actual incorrecta.';err.style.display='block';return;}
+  if(n1.length<4){err.textContent='Mínimo 4 caracteres.';err.style.display='block';return;}
+  if(n1!==n2){err.textContent='No coinciden.';err.style.display='block';return;}
+  localStorage.setItem(PW_KEY,n1);err.style.display='none';
+  alert('✅ Contraseña cambiada.');
+  document.getElementById('pwOld').value='';document.getElementById('pwNew').value='';document.getElementById('pwNew2').value='';
+}
+
+document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeAdmin();});
+
+function shareWA(name,price,avail) {
+  const msg='Hola, vi en el catálogo de Mercado La Fontane que *'+name+'* está a *'+price.toLocaleString('es-CU')+' CUP* ('+(avail?'disponible':'agotado')+'). ¿Pueden confirmarme disponibilidad?';
+  window.open('https://wa.me/5359382320?text='+encodeURIComponent(msg),'_blank');
+}
+
+// QR
+new QRCode(document.getElementById('qrcode'),{text:'https://mercado-la-fontane.pages.dev',width:180,height:180,colorDark:'#0d2b1e',colorLight:'#ffffff'});
+
+// INIT
+loadProducts();
+loadBanners();
+loadReviews();
+renderGallery();
+</script>
+</body>
+</html>
