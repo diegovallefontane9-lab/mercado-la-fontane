@@ -1,1 +1,1689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercadito La Fontane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+<style>
+/* ===== VARIABLES ===== */
+:root {
+  --verde:     #1a6b3c;
+  --verde-claro: #2d9459;
+  --verde-pale: #e8f5ee;
+  --crema:     #fdf8f0;
+  --dorado:    #c8932a;
+  --dorado-pale: #fef3dc;
+  --texto:     #1c2b1e;
+  --gris:      #6b7b6e;
+  --gris-claro:#e4ece6;
+  --blanco:    #ffffff;
+  --rojo:      #d64c4c;
+  --sombra:    0 4px 20px rgba(26,107,60,0.12);
+  --sombra-lg: 0 8px 40px rgba(26,107,60,0.18);
+  --radio:     14px;
+  --radio-lg:  22px;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--crema);
+  color: var(--texto);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; width: 100%; height: auto; object-fit: cover; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+input, textarea, select { font-family: inherit; outline: none; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--crema); }
+::-webkit-scrollbar-thumb { background: var(--verde-claro); border-radius: 3px; }
+
+/* ===== HEADER ===== */
+#header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--verde);
+  padding: 0 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+}
+.header-inner {
+  max-width: 900px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  height: 62px;
+}
+.logo-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.logo-icon {
+  width: 38px; height: 38px; background: var(--dorado);
+  border-radius: 10px; display: grid; place-items: center; font-size: 20px;
+  flex-shrink: 0;
+}
+.logo-text { color: var(--blanco); }
+.logo-text .name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 900; line-height: 1.1; letter-spacing: -0.3px;
+}
+.logo-text .tag { font-size: 10px; opacity: .7; letter-spacing: .5px; text-transform: uppercase; }
+
+.search-bar {
+  flex: 1; display: flex; align-items: center;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 50px; padding: 0 14px; gap: 8px;
+  transition: background .2s;
+}
+.search-bar:focus-within { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.5); }
+.search-bar input {
+  background: none; border: none; color: var(--blanco);
+  font-size: 14px; width: 100%; padding: 8px 0;
+}
+.search-bar input::placeholder { color: rgba(255,255,255,0.6); }
+.search-bar svg { opacity: .7; flex-shrink: 0; }
+
+.header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.btn-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(255,255,255,0.15); color: var(--blanco);
+  display: grid; place-items: center; transition: background .2s;
+  position: relative; font-size: 18px;
+}
+.btn-icon:hover { background: rgba(255,255,255,0.28); }
+.cart-badge {
+  position: absolute; top: 4px; right: 4px;
+  background: var(--dorado); color: var(--blanco);
+  font-size: 9px; font-weight: 700; width: 16px; height: 16px;
+  border-radius: 50%; display: grid; place-items: center; line-height: 1;
+  display: none;
+}
+.cart-badge.show { display: grid; }
+
+/* ===== BANNER ===== */
+#banners {
+  max-width: 900px; margin: 18px auto 0; padding: 0 14px;
+}
+.banner-track { position: relative; overflow: hidden; border-radius: var(--radio-lg); }
+.banner-slide {
+  display: none;
+  background: linear-gradient(135deg, var(--verde) 0%, #0f4d2a 100%);
+  padding: 22px 28px; color: var(--blanco);
+  position: relative; overflow: hidden;
+  min-height: 100px;
+}
+.banner-slide.active { display: block; animation: fadeIn .4s ease; }
+.banner-slide::after {
+  content: ''; position: absolute; right: -20px; top: -20px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,0.05); pointer-events: none;
+}
+.banner-slide .tag {
+  display: inline-block; background: var(--dorado); color: var(--blanco);
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 50px;
+  margin-bottom: 8px;
+}
+.banner-slide h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; line-height: 1.2; }
+.banner-slide p { font-size: 13px; opacity: .8; margin-top: 4px; }
+.banner-dots {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 5px;
+}
+.banner-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.4); transition: all .2s; cursor: pointer;
+}
+.banner-dot.active { background: var(--dorado); width: 18px; border-radius: 3px; }
+
+/* ===== CATEGORÍAS ===== */
+#cats-section { max-width: 900px; margin: 22px auto 0; padding: 0 14px; }
+.section-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gris); margin-bottom: 10px;
+}
+.cats-scroll {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.cats-scroll::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex-shrink: 0; padding: 7px 16px; border-radius: 50px;
+  font-size: 13px; font-weight: 500; background: var(--blanco);
+  border: 1.5px solid var(--gris-claro); color: var(--gris);
+  transition: all .18s; white-space: nowrap; cursor: pointer;
+}
+.cat-chip:hover { border-color: var(--verde-claro); color: var(--verde); }
+.cat-chip.active {
+  background: var(--verde); color: var(--blanco);
+  border-color: var(--verde); box-shadow: 0 2px 12px rgba(26,107,60,0.25);
+}
+
+/* ===== PRODUCTS ===== */
+#products-section { max-width: 900px; margin: 20px auto 0; padding: 0 14px 100px; }
+.products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.products-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; }
+#count-label { font-size: 13px; color: var(--gris); }
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 12px;
+}
+
+.product-card {
+  background: var(--blanco); border-radius: var(--radio);
+  overflow: hidden; box-shadow: var(--sombra);
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer; position: relative;
+}
+.product-card:hover { transform: translateY(-3px); box-shadow: var(--sombra-lg); }
+
+.product-img-wrap {
+  height: 148px; background: var(--verde-pale);
+  position: relative; overflow: hidden;
+}
+.product-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.product-img-wrap .no-img {
+  width: 100%; height: 100%; display: grid; place-items: center; font-size: 44px;
+}
+.product-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: var(--rojo); color: var(--blanco);
+  font-size: 9px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 50px;
+}
+
+.product-info { padding: 10px 12px 12px; }
+.product-cat { font-size: 10px; color: var(--verde-claro); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.product-name { font-size: 14px; font-weight: 600; margin: 2px 0 6px; line-height: 1.3; }
+.product-price { font-size: 17px; font-weight: 700; color: var(--verde); }
+.product-price span { font-size: 11px; font-weight: 400; color: var(--gris); }
+
+.product-footer { display: flex; gap: 6px; padding: 0 12px 12px; }
+.btn-wa {
+  flex: 1; background: #25d366; color: var(--blanco);
+  border-radius: 8px; padding: 7px 8px; font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: background .2s;
+}
+.btn-wa:hover { background: #1da851; }
+.btn-add {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--verde-pale); color: var(--verde);
+  display: grid; place-items: center; font-size: 20px; font-weight: 300;
+  transition: background .2s;
+}
+.btn-add:hover { background: var(--verde); color: var(--blanco); }
+
+.empty-state {
+  grid-column: 1/-1; text-align: center; padding: 60px 20px;
+  color: var(--gris);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 10px; }
+
+/* ===== SOBRE NOSOTROS ===== */
+#sobre-section {
+  max-width: 900px; margin: 0 auto; padding: 40px 14px 60px;
+  border-top: 1px solid var(--gris-claro);
+}
+.sobre-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.sobre-text h2 { font-family: 'Playfair Display', serif; font-size: 28px; line-height: 1.2; margin-bottom: 14px; }
+.sobre-text h2 span { color: var(--verde); }
+.sobre-text p { color: var(--gris); font-size: 14px; line-height: 1.75; margin-bottom: 10px; }
+.sobre-horarios {
+  background: var(--verde-pale); border-radius: var(--radio);
+  padding: 18px; margin-top: 18px;
+}
+.sobre-horarios h4 { font-size: 13px; font-weight: 700; color: var(--verde); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; }
+.horario-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--gris-claro); }
+.horario-row:last-child { border: none; }
+.horario-row strong { color: var(--verde-claro); }
+
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+  border-radius: var(--radio-lg); overflow: hidden;
+}
+.gallery-item {
+  height: 140px; background: var(--verde-pale);
+  display: grid; place-items: center; font-size: 32px;
+  cursor: pointer; overflow: hidden; position: relative;
+}
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.gallery-item:hover img { transform: scale(1.06); }
+.gallery-item.no-img { background: var(--verde-pale); }
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--texto); color: rgba(255,255,255,0.75);
+  padding: 30px 16px; text-align: center;
+}
+footer .footer-logo { font-family: 'Playfair Display', serif; color: var(--blanco); font-size: 20px; margin-bottom: 6px; }
+footer p { font-size: 12px; }
+footer a { color: var(--dorado); }
+
+/* ===== CART DRAWER ===== */
+#cart-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+#cart-overlay.open { opacity: 1; pointer-events: all; }
+#cart-drawer {
+  position: fixed; right: 0; top: 0; bottom: 0; width: min(360px, 100vw);
+  background: var(--blanco); z-index: 201;
+  transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+}
+#cart-drawer.open { transform: translateX(0); }
+.drawer-header {
+  padding: 20px 18px 16px; border-bottom: 1px solid var(--gris-claro);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.drawer-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; }
+.btn-close-drawer {
+  width: 34px; height: 34px; border-radius: 8px; background: var(--gris-claro);
+  display: grid; place-items: center; font-size: 18px; color: var(--gris);
+}
+#cart-items { flex: 1; overflow-y: auto; padding: 14px 18px; }
+.cart-empty-msg { text-align: center; padding: 40px 0; color: var(--gris); font-size: 14px; }
+.cart-item {
+  display: flex; gap: 12px; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid var(--gris-claro);
+}
+.cart-item-img {
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--verde-pale); flex-shrink: 0; overflow: hidden;
+  display: grid; place-items: center; font-size: 22px;
+}
+.cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+.cart-item-info { flex: 1; }
+.cart-item-info strong { font-size: 14px; display: block; }
+.cart-item-info .price { font-size: 13px; color: var(--verde); font-weight: 600; }
+.cart-qty-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.qty-btn {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--verde-pale); color: var(--verde); font-size: 16px;
+  display: grid; place-items: center;
+}
+.qty-val { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.btn-rm { color: var(--rojo); font-size: 13px; margin-left: auto; }
+
+.drawer-footer { padding: 16px 18px; border-top: 1px solid var(--gris-claro); }
+.total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+.total-row span:last-child { color: var(--verde); }
+.btn-send-wa {
+  width: 100%; padding: 14px; border-radius: var(--radio);
+  background: #25d366; color: var(--blanco); font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-send-wa:hover { background: #1da851; }
+
+/* ===== MODAL PRODUCTO ===== */
+#modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 300; display: none; align-items: flex-end; justify-content: center;
+}
+#modal-overlay.open { display: flex; }
+#product-modal {
+  background: var(--blanco); width: min(500px, 100vw);
+  border-radius: var(--radio-lg) var(--radio-lg) 0 0;
+  max-height: 90vh; overflow-y: auto;
+  animation: slideUp .3s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-img { height: 220px; background: var(--verde-pale); position: relative; overflow: hidden; display: grid; place-items: center; font-size: 64px; }
+.modal-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.modal-close-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,0.45); color: var(--blanco);
+  display: grid; place-items: center; font-size: 18px; z-index: 2;
+}
+.modal-body { padding: 20px 18px; }
+.modal-cat { font-size: 11px; color: var(--verde-claro); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.modal-name { font-family: 'Playfair Display', serif; font-size: 22px; margin: 4px 0 8px; }
+.modal-desc { font-size: 14px; color: var(--gris); line-height: 1.7; margin-bottom: 16px; }
+.modal-price { font-size: 26px; font-weight: 800; color: var(--verde); margin-bottom: 20px; }
+.modal-price span { font-size: 14px; font-weight: 400; color: var(--gris); }
+.modal-actions { display: flex; gap: 10px; margin-bottom: 24px; }
+.modal-actions .btn-add-cart {
+  flex: 1; padding: 13px; border-radius: var(--radio);
+  background: var(--verde); color: var(--blanco); font-size: 14px; font-weight: 700;
+  transition: background .2s;
+}
+.modal-actions .btn-add-cart:hover { background: var(--verde-claro); }
+.modal-actions .btn-wa-modal {
+  flex: 1; padding: 13px; border-radius: var(--radio);
+  background: #25d366; color: var(--blanco); font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+/* ===== RESEÑAS ===== */
+.reviews-section { border-top: 1px solid var(--gris-claro); padding-top: 18px; }
+.reviews-section h4 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.stars-input { display: flex; gap: 4px; margin-bottom: 10px; font-size: 24px; cursor: pointer; }
+.star-btn { color: #ddd; transition: color .1s; }
+.star-btn.lit { color: #f5c842; }
+.review-textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--gris-claro);
+  border-radius: 10px; font-size: 13px; resize: none; height: 72px;
+  transition: border .2s; margin-bottom: 10px;
+}
+.review-textarea:focus { border-color: var(--verde-claro); }
+.btn-submit-review {
+  padding: 9px 20px; background: var(--verde); color: var(--blanco);
+  border-radius: 8px; font-size: 13px; font-weight: 600;
+}
+.review-list { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.review-item {
+  background: var(--verde-pale); border-radius: 10px; padding: 12px;
+}
+.review-stars { color: #f5c842; font-size: 14px; }
+.review-text { font-size: 13px; color: var(--gris); margin-top: 4px; }
+.review-date { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+/* ===== QR MODAL ===== */
+#qr-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 400; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+#qr-modal.open { display: flex; }
+.qr-box {
+  background: var(--blanco); border-radius: var(--radio-lg);
+  padding: 28px 24px; text-align: center; max-width: 300px; width: 100%;
+  animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+.qr-box h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 4px; }
+.qr-box p { font-size: 12px; color: var(--gris); margin-bottom: 18px; }
+#qr-canvas { margin: 0 auto 18px; }
+.btn-close-qr { background: var(--gris-claro); color: var(--gris); padding: 9px 22px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+
+/* ===== ADMIN PANEL ===== */
+/* admin btn removed - activated via logo tap */
+
+#admin-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  z-index: 500; display: none;
+}
+#admin-overlay.open { display: block; }
+#admin-panel {
+  position: fixed; inset: 0; z-index: 501;
+  background: var(--crema); overflow-y: auto;
+  display: none; flex-direction: column;
+}
+#admin-panel.open { display: flex; }
+
+#admin-login {
+  position: fixed; inset: 0; z-index: 502;
+  background: rgba(28,43,30,0.85); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+#admin-login.open { display: flex; }
+.login-box {
+  background: var(--blanco); border-radius: var(--radio-lg);
+  padding: 32px 24px; width: 100%; max-width: 320px; text-align: center;
+}
+.login-box .login-icon { font-size: 36px; margin-bottom: 10px; }
+.login-box h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 6px; }
+.login-box p { font-size: 13px; color: var(--gris); margin-bottom: 20px; }
+.login-input {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1.5px solid var(--gris-claro); font-size: 15px;
+  margin-bottom: 14px; transition: border .2s;
+}
+.login-input:focus { border-color: var(--verde-claro); }
+.btn-login {
+  width: 100%; padding: 13px; border-radius: 10px;
+  background: var(--verde); color: var(--blanco); font-size: 15px; font-weight: 700;
+}
+.login-error { font-size: 13px; color: var(--rojo); margin-top: 8px; display: none; }
+
+/* ===== ADMIN INTERIOR ===== */
+.admin-topbar {
+  background: var(--verde); color: var(--blanco);
+  padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 10;
+}
+.admin-topbar h2 { font-family: 'Playfair Display', serif; font-size: 18px; flex: 1; }
+.btn-admin-close {
+  background: rgba(255,255,255,0.2); color: var(--blanco);
+  padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+}
+.admin-body { padding: 18px; max-width: 800px; margin: 0 auto; padding-bottom: 60px; }
+.admin-tabs { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
+.admin-tab {
+  padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 600;
+  background: var(--blanco); color: var(--gris); border: 1.5px solid var(--gris-claro);
+  transition: all .18s;
+}
+.admin-tab.active { background: var(--verde); color: var(--blanco); border-color: var(--verde); }
+
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+
+.form-card { background: var(--blanco); border-radius: var(--radio); padding: 18px; box-shadow: var(--sombra); margin-bottom: 22px; }
+.form-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--gris-claro); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gris); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.form-control {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--gris-claro);
+  border-radius: 10px; font-size: 14px; transition: border .2s;
+  background: var(--crema);
+}
+.form-control:focus { border-color: var(--verde-claro); background: var(--blanco); }
+.form-control select { appearance: none; }
+.btn-primary {
+  padding: 11px 22px; background: var(--verde); color: var(--blanco);
+  border-radius: 10px; font-size: 14px; font-weight: 700; transition: background .2s;
+}
+.btn-primary:hover { background: var(--verde-claro); }
+.btn-danger { background: var(--rojo); color: var(--blanco); padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+.btn-edit { background: var(--dorado-pale); color: var(--dorado); padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+
+.admin-list { display: flex; flex-direction: column; gap: 10px; }
+.admin-list-item {
+  background: var(--blanco); border-radius: var(--radio); padding: 14px;
+  display: flex; align-items: center; gap: 12px; box-shadow: var(--sombra);
+}
+.admin-item-img {
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--verde-pale); flex-shrink: 0; overflow: hidden;
+  display: grid; place-items: center; font-size: 22px;
+}
+.admin-item-img img { width: 100%; height: 100%; object-fit: cover; }
+.admin-item-info { flex: 1; }
+.admin-item-info strong { font-size: 14px; }
+.admin-item-info small { font-size: 12px; color: var(--gris); display: block; }
+.admin-item-actions { display: flex; gap: 6px; }
+
+.img-preview {
+  width: 100%; height: 160px; background: var(--verde-pale);
+  border-radius: 10px; margin-top: 8px; overflow: hidden;
+  display: grid; place-items: center; font-size: 13px; color: var(--gris);
+}
+.img-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ===== TOAST ===== */
+#toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--texto); color: var(--blanco); padding: 10px 20px;
+  border-radius: 50px; font-size: 13px; font-weight: 500;
+  z-index: 600; opacity: 0; transition: all .25s; white-space: nowrap;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== FLOATING WA ===== */
+#float-wa {
+  position: fixed; bottom: 24px; right: 18px; z-index: 90;
+  width: 54px; height: 54px; background: #25d366; border-radius: 50%;
+  display: grid; place-items: center; font-size: 26px;
+  box-shadow: 0 4px 18px rgba(37,211,102,0.4);
+  animation: pulse-wa 2.5s infinite;
+}
+@keyframes pulse-wa {
+  0%,100% { box-shadow: 0 4px 18px rgba(37,211,102,0.4); }
+  50% { box-shadow: 0 4px 28px rgba(37,211,102,0.7); }
+}
+
+/* ===== GALLERY LIGHTBOX ===== */
+#lightbox {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+  z-index: 700; display: none; align-items: center; justify-content: center;
+}
+#lightbox.open { display: flex; }
+#lightbox img { max-width: 94vw; max-height: 90vh; border-radius: var(--radio); object-fit: contain; }
+#lightbox .lb-close {
+  position: absolute; top: 16px; right: 16px;
+  color: var(--blanco); font-size: 28px; background: none; border: none; cursor: pointer;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 540px) {
+  .sobre-inner { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== STATUS BADGE ===== */
+.status-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  margin-right: 5px;
+}
+.status-open { background: #2d9459; }
+.status-closed { background: var(--rojo); }
+
+.uploading-spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: var(--blanco);
+  border-radius: 50%; animation: spin .6s linear infinite; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header id="header">
+  <div class="header-inner">
+    <div class="logo-wrap" id="logo-wrap" onclick="handleLogoTap()">
+      <div class="logo-icon">🛒</div>
+      <div class="logo-text">
+        <div class="name">Mercadito La Fontane</div>
+        <div class="tag">Guásimas, La Habana</div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Buscar producto…">
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="openQR()" title="Compartir QR">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>
+        </svg>
+      </button>
+      <button class="btn-icon" onclick="toggleCart()" title="Carrito">
+        🛍️
+        <span class="cart-badge" id="cart-count">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== BANNERS ===== -->
+<section id="banners">
+  <div class="banner-track" id="banner-track">
+    <div class="banner-slide active" style="background: linear-gradient(135deg,#1a6b3c,#0d4525)">
+      <div class="tag">Bienvenido</div>
+      <h2>Frescura y calidad<br>para tu hogar 🌿</h2>
+      <p>Los mejores productos al mejor precio</p>
+      <div class="banner-dots" id="banner-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CATEGORÍAS ===== -->
+<section id="cats-section">
+  <p class="section-label">Categorías</p>
+  <div class="cats-scroll" id="cats-scroll">
+    <button class="cat-chip active" data-cat="Todos" onclick="filterCat('Todos',this)">🏪 Todos</button>
+  </div>
+</section>
+
+<!-- ===== PRODUCTOS ===== -->
+<section id="products-section">
+  <div class="products-header">
+    <h2>Catálogo</h2>
+    <span id="count-label">Cargando…</span>
+  </div>
+  <div class="products-grid" id="products-grid">
+    <div class="empty-state"><div class="icon">⏳</div><p>Cargando productos…</p></div>
+  </div>
+</section>
+
+<!-- ===== SOBRE NOSOTROS ===== -->
+<section id="sobre-section">
+  <div class="sobre-inner">
+    <div class="sobre-text">
+      <h2>Somos tu mercado<br><span>de confianza</span> 🌿</h2>
+      <p>En <strong>Mercadito La Fontane</strong> llevamos años siendo parte de la vida cotidiana de Guásimas. Cada producto que ponemos en nuestros estantes lo elegimos con cuidado, pensando en la calidad que tu familia merece.</p>
+      <p>Somos un negocio familiar, atendido con calidez y comprometido con darte siempre lo mejor a precios justos. Tu satisfacción es nuestra mayor recompensa.</p>
+      <p>📍 Calle Caimán, Guásimas, La Habana · 📱 <a href="https://wa.me/5359382320" style="color:var(--verde);font-weight:600">+53 59382320</a></p>
+      <div class="sobre-horarios">
+        <h4>📅 Horarios de atención</h4>
+        <div class="horario-row"><span>Lunes – Viernes</span><strong>8:00 AM – 8:00 PM</strong></div>
+        <div class="horario-row"><span>Sábados – Domingos</span><strong>10:00 AM – 6:00 PM</strong></div>
+        <div class="horario-row"><span id="estado-ahora"></span><strong id="hora-ahora"></strong></div>
+      </div>
+    </div>
+    <div>
+      <p class="section-label" style="margin-bottom:10px">Nuestro espacio</p>
+      <div class="gallery-grid" id="gallery-grid">
+        <div class="gallery-item no-img">📸</div>
+        <div class="gallery-item no-img">🏪</div>
+        <div class="gallery-item no-img">🛒</div>
+        <div class="gallery-item no-img">🌿</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Mercadito La Fontane</div>
+  <p>Calle Caimán, Guásimas, La Habana · <a href="https://wa.me/5359382320">+53 59382320</a></p>
+  <p style="margin-top:6px;opacity:.5;font-size:11px">© 2025 Mercadito La Fontane · Todos los derechos reservados</p>
+</footer>
+
+<!-- ===== FLOATING WA ===== -->
+<a id="float-wa" href="https://wa.me/5359382320" target="_blank" title="Escríbenos por WhatsApp">💬</a>
+
+<!-- admin se activa con 5 clics en el logo -->
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-overlay" onclick="toggleCart()"></div>
+<div id="cart-drawer">
+  <div class="drawer-header">
+    <h3>🛍️ Tu Carrito</h3>
+    <button class="btn-close-drawer" onclick="toggleCart()">✕</button>
+  </div>
+  <div id="cart-items"></div>
+  <div class="drawer-footer">
+    <div class="total-row"><span>Total</span><span id="cart-total">$0.00</span></div>
+    <button class="btn-send-wa" onclick="sendCartToWA()">
+      💬 Enviar pedido por WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- ===== QR MODAL ===== -->
+<div id="qr-modal">
+  <div class="qr-box">
+    <h3>📲 Comparte el Mercado</h3>
+    <p>Escanea o comparte este QR para visitar la tienda</p>
+    <canvas id="qr-canvas"></canvas>
+    <br>
+    <button class="btn-close-qr" onclick="closeQR()">Cerrar</button>
+  </div>
+</div>
+
+<!-- ===== PRODUCT MODAL ===== -->
+<div id="modal-overlay" onclick="handleModalBg(event)">
+  <div id="product-modal">
+    <div class="modal-img" id="modal-img-wrap">
+      <span id="modal-emoji">🛒</span>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modal-cat"></div>
+      <div class="modal-name" id="modal-name"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-price" id="modal-price"></div>
+      <div class="modal-actions">
+        <button class="btn-add-cart" id="modal-add-btn" onclick="addFromModal()">+ Agregar al carrito</button>
+        <button class="btn-wa-modal" id="modal-wa-btn">💬 Pedir</button>
+      </div>
+      <div class="reviews-section">
+        <h4>⭐ Reseñas del producto</h4>
+        <div class="stars-input" id="stars-input"></div>
+        <textarea class="review-textarea" id="review-text" placeholder="Escribe tu comentario (opcional)…"></textarea>
+        <button class="btn-submit-review" onclick="submitReview()">Publicar reseña</button>
+        <div class="review-list" id="review-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lb-img" src="" alt="">
+</div>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div id="admin-login">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <h3>Panel de Administración</h3>
+    <p>Ingresa la contraseña para continuar</p>
+    <input class="login-input" type="password" id="admin-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkAdminPass()">
+    <button class="btn-login" onclick="checkAdminPass()">Entrar</button>
+    <p class="login-error" id="login-error">Contraseña incorrecta</p>
+    <button onclick="closeAdminLogin()" style="margin-top:12px;font-size:13px;color:var(--gris)">Cancelar</button>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="admin-overlay"></div>
+<div id="admin-panel">
+  <div class="admin-topbar">
+    <h2>⚙️ Panel de Administración</h2>
+    <button class="btn-admin-close" onclick="closeAdmin()">Salir</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('productos',this)">📦 Productos</button>
+      <button class="admin-tab" onclick="switchTab('categorias',this)">🏷️ Categorías</button>
+      <button class="admin-tab" onclick="switchTab('banners',this)">🖼️ Banners</button>
+      <button class="admin-tab" onclick="switchTab('galeria',this)">📸 Galería</button>
+      <button class="admin-tab" onclick="switchTab('config',this)">🔑 Contraseña</button>
+    </div>
+
+    <!-- PRODUCTOS TAB -->
+    <div class="admin-section active" id="tab-productos">
+      <div class="form-card">
+        <h4 id="prod-form-title">➕ Nuevo Producto</h4>
+        <input type="hidden" id="edit-prod-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input class="form-control" type="text" id="p-name" placeholder="Ej: Leche condensada">
+          </div>
+          <div class="form-group">
+            <label>Precio (CUP)</label>
+            <input class="form-control" type="number" id="p-price" placeholder="0.00" step="0.01">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoría</label>
+            <select class="form-control" id="p-cat"></select>
+          </div>
+          <div class="form-group">
+            <label>Emoji del producto</label>
+            <input class="form-control" type="text" id="p-emoji" placeholder="🥫" maxlength="4">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea class="form-control" id="p-desc" rows="2" placeholder="Descripción breve…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Foto del producto</label>
+          <input class="form-control" type="file" id="p-img" accept="image/*" onchange="previewProdImg(this)">
+          <div class="img-preview" id="p-img-preview"><span>Sin imagen seleccionada</span></div>
+        </div>
+        <div class="form-group">
+          <label>¿Tiene oferta?</label>
+          <select class="form-control" id="p-oferta">
+            <option value="">No</option>
+            <option value="Oferta">Oferta</option>
+            <option value="Nuevo">Nuevo</option>
+            <option value="Agotado">Agotado</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-primary" id="save-prod-btn" onclick="saveProduct()">💾 Guardar Producto</button>
+          <button onclick="cancelEditProduct()" style="padding:11px 18px;border-radius:10px;background:var(--gris-claro);font-size:14px;font-weight:600">Cancelar</button>
+        </div>
+      </div>
+      <h4 style="margin-bottom:12px;font-size:15px">📋 Productos guardados</h4>
+      <div class="admin-list" id="admin-prod-list"></div>
+    </div>
+
+    <!-- CATEGORIAS TAB -->
+    <div class="admin-section" id="tab-categorias">
+      <div class="form-card">
+        <h4>➕ Nueva Categoría</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input class="form-control" type="text" id="cat-name" placeholder="Ej: Lácteos">
+          </div>
+          <div class="form-group">
+            <label>Emoji</label>
+            <input class="form-control" type="text" id="cat-emoji" placeholder="🥛" maxlength="4">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="saveCategory()">💾 Guardar Categoría</button>
+      </div>
+      <div class="admin-list" id="admin-cat-list"></div>
+    </div>
+
+    <!-- BANNERS TAB -->
+    <div class="admin-section" id="tab-banners">
+      <div class="form-card">
+        <h4>➕ Nuevo Banner</h4>
+        <div class="form-group">
+          <label>Etiqueta (ej: Oferta)</label>
+          <input class="form-control" type="text" id="bn-tag" placeholder="OFERTA">
+        </div>
+        <div class="form-group">
+          <label>Título</label>
+          <input class="form-control" type="text" id="bn-title" placeholder="Gran oferta de temporada 🎉">
+        </div>
+        <div class="form-group">
+          <label>Subtítulo</label>
+          <input class="form-control" type="text" id="bn-sub" placeholder="Detalles adicionales…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Color fondo (CSS)</label>
+            <input class="form-control" type="text" id="bn-color" placeholder="linear-gradient(135deg,#1a6b3c,#0d4525)">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="saveBanner()">💾 Guardar Banner</button>
+      </div>
+      <div class="admin-list" id="admin-banner-list"></div>
+    </div>
+
+    <!-- GALERIA TAB -->
+    <div class="admin-section" id="tab-galeria">
+      <div class="form-card">
+        <h4>📸 Subir foto a la galería</h4>
+        <div class="form-group">
+          <label>Foto</label>
+          <input class="form-control" type="file" id="gallery-img" accept="image/*" onchange="previewGalleryImg(this)">
+          <div class="img-preview" id="gallery-preview"><span>Sin imagen seleccionada</span></div>
+        </div>
+        <div class="form-group">
+          <label>Descripción (opcional)</label>
+          <input class="form-control" type="text" id="gallery-desc" placeholder="El equipo de trabajo…">
+        </div>
+        <button class="btn-primary" id="save-gallery-btn" onclick="saveGalleryPhoto()">📤 Subir Foto</button>
+      </div>
+      <div class="products-grid" id="admin-gallery-list" style="margin-top:8px"></div>
+    <!-- CONFIG TAB -->
+    <div class="admin-section" id="tab-config">
+      <div class="form-card">
+        <h4>🔑 Cambiar contraseña del panel</h4>
+        <div class="form-group">
+          <label>Contraseña actual</label>
+          <input class="form-control" type="password" id="pass-current" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label>Nueva contraseña</label>
+          <input class="form-control" type="password" id="pass-new" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label>Confirmar nueva contraseña</label>
+          <input class="form-control" type="password" id="pass-confirm" placeholder="••••••••">
+        </div>
+        <button class="btn-primary" onclick="changeAdminPass()">💾 Guardar nueva contraseña</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN — EDITA ESTOS VALORES
+   ============================================================ */
+const SUPABASE_URL  = 'https://TU_PROYECTO.supabase.co';    // ← Reemplaza
+const SUPABASE_KEY  = 'TU_ANON_KEY_AQUI';                   // ← Reemplaza
+const ADMIN_PASS_DEFAULT = 'ludmila80';
+let ADMIN_PASS = localStorage.getItem('admin_pass_fontane') || ADMIN_PASS_DEFAULT;
+const WA_NUMBER     = '5359382320';
+const SITE_URL      = 'https://mercadito-la-fontane.pages.dev'; // ← URL final
+
+/* ============================================================
+   SUPABASE CLIENT
+   ============================================================ */
+const { createClient } = supabase;
+let sb;
+try { sb = createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.warn('Supabase no configurado aún'); }
+
+/* ============================================================
+   ESTADO GLOBAL
+   ============================================================ */
+let allProducts  = [];
+let categories   = [];
+let bannersData  = [];
+let galleryData  = [];
+let cart         = JSON.parse(localStorage.getItem('cart_fontane') || '[]');
+let currentCat   = 'Todos';
+let currentSearch = '';
+let currentModalProduct = null;
+let currentStarRating = 0;
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  updateOpenStatus();
+  renderCart();
+  setupSearch();
+  generateQR();
+  await Promise.all([loadCategories(), loadProducts(), loadBanners(), loadGallery()]);
+});
+
+/* ============================================================
+   OPEN/CLOSED STATUS
+   ============================================================ */
+function updateOpenStatus() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const h = now.getHours(), m = now.getMinutes();
+  const t = h * 60 + m;
+  let open = false;
+  if (day >= 1 && day <= 5) open = (t >= 480 && t < 1200); // Mon-Fri 8-20
+  else open = (t >= 600 && t < 1080); // Sat-Sun 10-18
+
+  const el = document.getElementById('estado-ahora');
+  const hl = document.getElementById('hora-ahora');
+  if(el) {
+    el.innerHTML = `<span class="status-dot ${open?'status-open':'status-closed'}"></span>${open?'Abierto ahora':'Cerrado ahora'}`;
+    hl.textContent = now.toLocaleTimeString('es-CU',{hour:'2-digit',minute:'2-digit'});
+  }
+  setTimeout(updateOpenStatus, 30000);
+}
+
+/* ============================================================
+   SUPABASE: CATEGORIES
+   ============================================================ */
+async function loadCategories() {
+  if(!sb) { categories = getDefaultCats(); renderCats(); fillCatSelect(); return; }
+  const { data, error } = await sb.from('categories').select('*').order('name');
+  if(error || !data?.length) { categories = getDefaultCats(); }
+  else categories = data;
+  renderCats();
+  fillCatSelect();
+  renderAdminCatList();
+}
+
+function getDefaultCats() {
+  return [
+    {id:'1',name:'Aseo',emoji:'🧴'},{id:'2',name:'Alimentos',emoji:'🍚'},
+    {id:'3',name:'Bebidas',emoji:'🥤'},{id:'4',name:'Lácteos',emoji:'🥛'},
+    {id:'5',name:'Snacks',emoji:'🍿'},{id:'6',name:'Limpieza',emoji:'🧹'},
+  ];
+}
+
+function renderCats() {
+  const wrap = document.getElementById('cats-scroll');
+  const chips = categories.map(c =>
+    `<button class="cat-chip" data-cat="${c.name}" onclick="filterCat('${c.name}',this)">${c.emoji||''} ${c.name}</button>`
+  ).join('');
+  wrap.innerHTML = `<button class="cat-chip active" data-cat="Todos" onclick="filterCat('Todos',this)">🏪 Todos</button>${chips}`;
+}
+
+function fillCatSelect() {
+  const sel = document.getElementById('p-cat');
+  if(!sel) return;
+  sel.innerHTML = categories.map(c=>`<option value="${c.name}">${c.emoji||''} ${c.name}</option>`).join('');
+}
+
+/* ============================================================
+   SUPABASE: PRODUCTS
+   ============================================================ */
+async function loadProducts() {
+  if(!sb) { allProducts = getDemoProducts(); renderProducts(); renderAdminProdList(); return; }
+  const { data, error } = await sb.from('products').select('*').order('created_at', {ascending:false});
+  if(error) { console.error(error); allProducts = getDemoProducts(); }
+  else allProducts = data || [];
+  renderProducts();
+  renderAdminProdList();
+}
+
+function getDemoProducts() {
+  return [
+    {id:'d1',name:'Leche condensada',price:85,category:'Lácteos',emoji:'🥛',description:'Leche condensada La Lechera 397g',badge:''},
+    {id:'d2',name:'Aceite de girasol',price:120,category:'Alimentos',emoji:'🫙',description:'1 litro, primera calidad',badge:'Oferta'},
+    {id:'d3',name:'Champú H&S',price:200,category:'Aseo',emoji:'🧴',description:'Anticaspa 400ml',badge:''},
+    {id:'d4',name:'Refresco Cola',price:40,category:'Bebidas',emoji:'🥤',description:'355ml bien frío',badge:'Nuevo'},
+    {id:'d5',name:'Arroz grano largo',price:65,category:'Alimentos',emoji:'🍚',description:'Bolsa 1kg',badge:''},
+    {id:'d6',name:'Papas fritas',price:55,category:'Snacks',emoji:'🍟',description:'Bolsa grande',badge:''},
+  ];
+}
+
+function renderProducts() {
+  const grid = document.getElementById('products-grid');
+  const label = document.getElementById('count-label');
+  let filtered = allProducts;
+  if(currentCat !== 'Todos') filtered = filtered.filter(p => p.category === currentCat);
+  if(currentSearch) filtered = filtered.filter(p =>
+    p.name.toLowerCase().includes(currentSearch) ||
+    (p.description||'').toLowerCase().includes(currentSearch)
+  );
+  label.textContent = `${filtered.length} producto${filtered.length!==1?'s':''}`;
+  if(!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>No se encontraron productos</p></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(p => productCard(p)).join('');
+}
+
+function productCard(p) {
+  const imgHtml = p.img_url
+    ? `<img src="${p.img_url}" alt="${p.name}" loading="lazy">`
+    : `<div class="no-img">${p.emoji||'🛒'}</div>`;
+  const badge = p.badge ? `<div class="product-badge">${p.badge}</div>` : '';
+  return `
+  <div class="product-card" onclick="openModal('${p.id}')">
+    <div class="product-img-wrap">${imgHtml}${badge}</div>
+    <div class="product-info">
+      <div class="product-cat">${p.category||''}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-price">$${Number(p.price).toFixed(2)}<span> CUP</span></div>
+    </div>
+    <div class="product-footer">
+      <button class="btn-wa" onclick="event.stopPropagation();askViaWA('${p.id}')">💬 Pedir</button>
+      <button class="btn-add" onclick="event.stopPropagation();addToCart('${p.id}')">+</button>
+    </div>
+  </div>`;
+}
+
+function filterCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderProducts();
+}
+
+function setupSearch() {
+  document.getElementById('search-input').addEventListener('input', function() {
+    currentSearch = this.value.toLowerCase().trim();
+    renderProducts();
+  });
+}
+
+/* ============================================================
+   SUPABASE: BANNERS
+   ============================================================ */
+async function loadBanners() {
+  if(!sb) { bannersData = getDefaultBanners(); renderBanners(); return; }
+  const { data } = await sb.from('banners').select('*').order('created_at');
+  bannersData = (data && data.length) ? data : getDefaultBanners();
+  renderBanners();
+  renderAdminBannerList();
+}
+
+function getDefaultBanners() {
+  return [
+    {id:'b1',tag:'Bienvenido',title:'Frescura y calidad para tu hogar 🌿',sub:'Los mejores productos al mejor precio',color:'linear-gradient(135deg,#1a6b3c,#0d4525)'},
+    {id:'b2',tag:'Novedad',title:'¡Nuevos productos disponibles! 🎉',sub:'Visítanos y descubre lo que hay esta semana',color:'linear-gradient(135deg,#c8932a,#a0701a)'},
+  ];
+}
+
+function renderBanners() {
+  const track = document.getElementById('banner-track');
+  const dotsWrap = document.getElementById('banner-dots');
+  if(!bannersData.length) return;
+  track.innerHTML = bannersData.map((b,i) => `
+    <div class="banner-slide ${i===0?'active':''}" style="background:${b.color||'linear-gradient(135deg,#1a6b3c,#0d4525)'}">
+      <div class="tag">${b.tag||''}</div>
+      <h2>${b.title||''}</h2>
+      <p>${b.sub||''}</p>
+      <div class="banner-dots" id="banner-dots-inner"></div>
+    </div>`).join('');
+  // dots
+  const firstSlide = track.querySelector('.banner-slide');
+  if(firstSlide) {
+    const dd = firstSlide.querySelector('.banner-dots');
+    if(dd) dd.innerHTML = bannersData.map((_,i)=>`<span class="banner-dot ${i===0?'active':''}" onclick="goToBanner(${i})"></span>`).join('');
+  }
+  if(bannersData.length > 1) autoBanner();
+}
+
+let bannerIdx = 0;
+function goToBanner(i) {
+  const slides = document.querySelectorAll('.banner-slide');
+  slides.forEach(s => s.classList.remove('active'));
+  slides[i]?.classList.add('active');
+  document.querySelectorAll('.banner-dot').forEach((d,j) => d.classList.toggle('active', j===i));
+  bannerIdx = i;
+}
+function autoBanner() {
+  setInterval(() => goToBanner((bannerIdx+1) % bannersData.length), 4000);
+}
+
+/* ============================================================
+   SUPABASE: GALLERY
+   ============================================================ */
+async function loadGallery() {
+  if(!sb) return;
+  const { data } = await sb.from('gallery').select('*').order('created_at', {ascending:false});
+  galleryData = data || [];
+  renderGallery();
+  renderAdminGalleryList();
+}
+
+function renderGallery() {
+  const grid = document.getElementById('gallery-grid');
+  if(!galleryData.length) return;
+  const items = galleryData.slice(0,4);
+  grid.innerHTML = items.map(g => `
+    <div class="gallery-item" onclick="openLightbox('${g.img_url}')">
+      <img src="${g.img_url}" alt="${g.description||''}" loading="lazy">
+    </div>`).join('');
+}
+
+/* ============================================================
+   MODAL PRODUCTO
+   ============================================================ */
+function openModal(id) {
+  const p = allProducts.find(x => x.id == id || x.id === id);
+  if(!p) return;
+  currentModalProduct = p;
+  currentStarRating = 0;
+
+  const wrap = document.getElementById('modal-img-wrap');
+  const emoji = document.getElementById('modal-emoji');
+  if(p.img_url) {
+    let img = wrap.querySelector('img') || document.createElement('img');
+    img.src = p.img_url; img.alt = p.name;
+    if(!wrap.querySelector('img')) wrap.insertBefore(img, wrap.firstChild);
+    emoji.style.display = 'none';
+  } else {
+    const existing = wrap.querySelector('img');
+    if(existing) existing.remove();
+    emoji.textContent = p.emoji||'🛒';
+    emoji.style.display = '';
+  }
+
+  document.getElementById('modal-cat').textContent  = p.category || '';
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-desc').textContent = p.description || '';
+  document.getElementById('modal-price').innerHTML  = `$${Number(p.price).toFixed(2)} <span>CUP</span>`;
+  document.getElementById('modal-wa-btn').onclick   = () => askViaWA(p.id);
+
+  renderStarsInput();
+  loadReviews(p.id);
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleModalBg(e) { if(e.target.id==='modal-overlay') closeModal(); }
+function addFromModal() {
+  if(currentModalProduct) { addToCart(currentModalProduct.id); closeModal(); }
+}
+
+/* ============================================================
+   RESEÑAS
+   ============================================================ */
+function renderStarsInput() {
+  const wrap = document.getElementById('stars-input');
+  wrap.innerHTML = [1,2,3,4,5].map(n =>
+    `<span class="star-btn" data-n="${n}" onclick="setStarRating(${n})">★</span>`
+  ).join('');
+}
+
+function setStarRating(n) {
+  currentStarRating = n;
+  document.querySelectorAll('.star-btn').forEach((s,i) => {
+    s.classList.toggle('lit', i < n);
+  });
+}
+
+async function loadReviews(productId) {
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  if(!sb) return;
+  const { data } = await sb.from('reviews').select('*').eq('product_id', productId).order('created_at', {ascending:false});
+  if(!data?.length) { list.innerHTML = '<p style="font-size:13px;color:var(--gris)">Aún no hay reseñas. ¡Sé el primero!</p>'; return; }
+  list.innerHTML = data.map(r => `
+    <div class="review-item">
+      <div class="review-stars">${'★'.repeat(r.stars||0)}${'☆'.repeat(5-(r.stars||0))}</div>
+      ${r.comment ? `<div class="review-text">${r.comment}</div>` : ''}
+      <div class="review-date">${new Date(r.created_at).toLocaleDateString('es-CU')}</div>
+    </div>`).join('');
+}
+
+async function submitReview() {
+  if(!currentModalProduct) return;
+  if(!currentStarRating) { showToast('Selecciona al menos 1 estrella ⭐'); return; }
+  const comment = document.getElementById('review-text').value.trim();
+  if(sb) {
+    await sb.from('reviews').insert({ product_id: currentModalProduct.id, stars: currentStarRating, comment });
+  }
+  showToast('¡Gracias por tu reseña! 🌟');
+  document.getElementById('review-text').value = '';
+  currentStarRating = 0;
+  renderStarsInput();
+  loadReviews(currentModalProduct.id);
+}
+
+/* ============================================================
+   CARRITO
+   ============================================================ */
+function addToCart(id) {
+  const p = allProducts.find(x => x.id == id);
+  if(!p) return;
+  const existing = cart.find(x => x.id == id);
+  if(existing) existing.qty++;
+  else cart.push({...p, qty:1});
+  saveCart();
+  showToast(`✅ ${p.name} agregado al carrito`);
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id != id);
+  saveCart();
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(x => x.id == id);
+  if(!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  saveCart();
+}
+
+function saveCart() {
+  localStorage.setItem('cart_fontane', JSON.stringify(cart));
+  renderCart();
+}
+
+function renderCart() {
+  const wrap = document.getElementById('cart-items');
+  const badge = document.getElementById('cart-count');
+  const total = document.getElementById('cart-total');
+  const totalQty = cart.reduce((s,x) => s + x.qty, 0);
+  const totalPrice = cart.reduce((s,x) => s + (x.price * x.qty), 0);
+
+  badge.textContent = totalQty;
+  badge.classList.toggle('show', totalQty > 0);
+  total.textContent = `$${totalPrice.toFixed(2)} CUP`;
+
+  if(!cart.length) {
+    wrap.innerHTML = '<div class="cart-empty-msg">🛒<br>Tu carrito está vacío<br><small>Agrega productos para hacer tu pedido</small></div>';
+    return;
+  }
+  wrap.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-img">
+        ${item.img_url ? `<img src="${item.img_url}" alt="${item.name}">` : item.emoji||'🛒'}
+      </div>
+      <div class="cart-item-info">
+        <strong>${item.name}</strong>
+        <span class="price">$${(item.price * item.qty).toFixed(2)}</span>
+        <div class="cart-qty-row">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+          <button class="btn-rm" onclick="removeFromCart('${item.id}')">✕ Quitar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleCart() {
+  const drawer = document.getElementById('cart-drawer');
+  const overlay = document.getElementById('cart-overlay');
+  const open = drawer.classList.toggle('open');
+  overlay.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+
+function sendCartToWA() {
+  if(!cart.length) { showToast('El carrito está vacío'); return; }
+  const lines = cart.map(x => `• ${x.name} x${x.qty} = $${(x.price*x.qty).toFixed(2)} CUP`).join('\n');
+  const total = cart.reduce((s,x) => s + x.price*x.qty, 0);
+  const msg = `🛒 *Pedido — Mercadito La Fontane*\n\n${lines}\n\n💰 *Total: $${total.toFixed(2)} CUP*\n\nHola, quisiera hacer este pedido. ¿Está disponible?`;
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function askViaWA(id) {
+  const p = allProducts.find(x => x.id == id);
+  if(!p) return;
+  const msg = `Hola 👋, quisiera información sobre *${p.name}* a $${Number(p.price).toFixed(2)} CUP. ¿Está disponible?`;
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+/* ============================================================
+   QR
+   ============================================================ */
+function generateQR() {
+  try {
+    QRCode.toCanvas(document.getElementById('qr-canvas'), SITE_URL, { width:200, margin:2, color:{dark:'#1a6b3c',light:'#ffffff'} });
+  } catch(e) { console.warn('QR no generado'); }
+}
+function openQR() { document.getElementById('qr-modal').classList.add('open'); }
+function closeQR() { document.getElementById('qr-modal').classList.remove('open'); }
+document.getElementById('qr-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeQR();
+});
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+function openLightbox(url) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lb-img').src = url;
+  lb.classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if(e.target === this) closeLightbox();
+});
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ============================================================
+   CAMBIAR CONTRASEÑA
+   ============================================================ */
+function changeAdminPass() {
+  const current  = document.getElementById('pass-current').value;
+  const newPass  = document.getElementById('pass-new').value;
+  const confirm  = document.getElementById('pass-confirm').value;
+
+  if(current !== ADMIN_PASS) { showToast('❌ La contraseña actual es incorrecta'); return; }
+  if(newPass.length < 4)     { showToast('La nueva contraseña debe tener al menos 4 caracteres'); return; }
+  if(newPass !== confirm)    { showToast('❌ Las contraseñas nuevas no coinciden'); return; }
+
+  ADMIN_PASS = newPass;
+  localStorage.setItem('admin_pass_fontane', newPass);
+  document.getElementById('pass-current').value = '';
+  document.getElementById('pass-new').value     = '';
+  document.getElementById('pass-confirm').value = '';
+  showToast('✅ Contraseña actualizada correctamente');
+}
+   ============================================================ */
+let logoTaps = 0, logoTimer = null;
+function handleLogoTap() {
+  logoTaps++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoTaps = 0; }, 2000);
+  if(logoTaps >= 5) {
+    logoTaps = 0;
+    openAdminLogin();
+  }
+}
+function openAdminLogin() { document.getElementById('admin-login').classList.add('open'); }
+function closeAdminLogin() {
+  document.getElementById('admin-login').classList.remove('open');
+  document.getElementById('admin-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+function checkAdminPass() {
+  const v = document.getElementById('admin-pass').value;
+  if(v === ADMIN_PASS) {
+    closeAdminLogin();
+    openAdmin();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+/* ============================================================
+   ADMIN PANEL
+   ============================================================ */
+function openAdmin() {
+  document.getElementById('admin-panel').classList.add('open');
+  document.getElementById('admin-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadAdminData();
+}
+function closeAdmin() {
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('admin-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function switchTab(tab, el) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  el.classList.add('active');
+}
+function loadAdminData() {
+  renderAdminProdList();
+  renderAdminCatList();
+  renderAdminBannerList();
+  renderAdminGalleryList();
+}
+
+/* ---- PRODUCTS ---- */
+function renderAdminProdList() {
+  const list = document.getElementById('admin-prod-list');
+  if(!list) return;
+  if(!allProducts.length) { list.innerHTML = '<p style="color:var(--gris);font-size:13px">No hay productos aún.</p>'; return; }
+  list.innerHTML = allProducts.map(p => `
+    <div class="admin-list-item">
+      <div class="admin-item-img">
+        ${p.img_url ? `<img src="${p.img_url}" alt="${p.name}">` : p.emoji||'🛒'}
+      </div>
+      <div class="admin-item-info">
+        <strong>${p.name}</strong>
+        <small>$${Number(p.price).toFixed(2)} CUP · ${p.category||''}</small>
+      </div>
+      <div class="admin-item-actions">
+        <button class="btn-edit" onclick="editProduct('${p.id}')">✏️</button>
+        <button class="btn-danger" onclick="deleteProduct('${p.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function previewProdImg(input) {
+  const preview = document.getElementById('p-img-preview');
+  if(input.files && input.files[0]) {
+    const r = new FileReader();
+    r.onload = e => { preview.innerHTML = `<img src="${e.target.result}" alt="preview">`; };
+    r.readAsDataURL(input.files[0]);
+  }
+}
+
+async function saveProduct() {
+  const id    = document.getElementById('edit-prod-id').value;
+  const name  = document.getElementById('p-name').value.trim();
+  const price = parseFloat(document.getElementById('p-price').value);
+  const cat   = document.getElementById('p-cat').value;
+  const emoji = document.getElementById('p-emoji').value.trim();
+  const desc  = document.getElementById('p-desc').value.trim();
+  const badge = document.getElementById('p-oferta').value;
+  const file  = document.getElementById('p-img').files[0];
+
+  if(!name || isNaN(price)) { showToast('Nombre y precio son obligatorios'); return; }
+
+  const btn = document.getElementById('save-prod-btn');
+  btn.innerHTML = '<span class="uploading-spinner"></span>Guardando…';
+  btn.disabled = true;
+
+  let img_url = id ? (allProducts.find(p=>p.id==id)?.img_url||null) : null;
+
+  if(file && sb) {
+    const ext = file.name.split('.').pop();
+    const path = `products/${Date.now()}.${ext}`;
+    const { data: upData, error: upErr } = await sb.storage.from('images').upload(path, file, { upsert:true, contentType: file.type });
+    if(!upErr) {
+      const { data: urlData } = sb.storage.from('images').getPublicUrl(path);
+      img_url = urlData.publicUrl;
+    }
+  }
+
+  const payload = { name, price, category:cat, emoji, description:desc, badge, img_url };
+
+  if(sb) {
+    if(id) {
+      await sb.from('products').update(payload).eq('id', id);
+    } else {
+      await sb.from('products').insert(payload);
+    }
+  } else {
+    // localStorage fallback
+    if(id) {
+      const idx = allProducts.findIndex(p=>p.id==id);
+      if(idx>=0) allProducts[idx] = {...allProducts[idx], ...payload};
+    } else {
+      allProducts.unshift({...payload, id: 'l'+Date.now()});
+    }
+  }
+
+  await loadProducts();
+  cancelEditProduct();
+  showToast(id ? '✅ Producto actualizado' : '✅ Producto guardado');
+  btn.innerHTML = '💾 Guardar Producto';
+  btn.disabled = false;
+}
+
+function editProduct(id) {
+  const p = allProducts.find(x => x.id == id);
+  if(!p) return;
+  document.getElementById('edit-prod-id').value = p.id;
+  document.getElementById('p-name').value   = p.name;
+  document.getElementById('p-price').value  = p.price;
+  document.getElementById('p-cat').value    = p.category;
+  document.getElementById('p-emoji').value  = p.emoji||'';
+  document.getElementById('p-desc').value   = p.description||'';
+  document.getElementById('p-oferta').value = p.badge||'';
+  document.getElementById('prod-form-title').textContent = '✏️ Editar Producto';
+  if(p.img_url) document.getElementById('p-img-preview').innerHTML = `<img src="${p.img_url}" alt="${p.name}">`;
+  document.getElementById('tab-productos').scrollIntoView({ behavior:'smooth' });
+}
+
+function cancelEditProduct() {
+  document.getElementById('edit-prod-id').value = '';
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-emoji').value = '';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('p-oferta').value = '';
+  document.getElementById('prod-form-title').textContent = '➕ Nuevo Producto';
+  document.getElementById('p-img-preview').innerHTML = '<span>Sin imagen seleccionada</span>';
+  document.getElementById('p-img').value = '';
+}
+
+async function deleteProduct(id) {
+  if(!confirm('¿Eliminar este producto?')) return;
+  if(sb) await sb.from('products').delete().eq('id', id);
+  else allProducts = allProducts.filter(p=>p.id!=id);
+  await loadProducts();
+  showToast('🗑️ Producto eliminado');
+}
+
+/* ---- CATEGORIES ---- */
+function renderAdminCatList() {
+  const list = document.getElementById('admin-cat-list');
+  if(!list) return;
+  list.innerHTML = categories.map(c => `
+    <div class="admin-list-item">
+      <div class="admin-item-img">${c.emoji||'🏷️'}</div>
+      <div class="admin-item-info"><strong>${c.name}</strong></div>
+      <div class="admin-item-actions">
+        <button class="btn-danger" onclick="deleteCategory('${c.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function saveCategory() {
+  const name  = document.getElementById('cat-name').value.trim();
+  const emoji = document.getElementById('cat-emoji').value.trim();
+  if(!name) { showToast('Escribe el nombre de la categoría'); return; }
+  if(sb) await sb.from('categories').insert({ name, emoji });
+  else categories.push({ id:'l'+Date.now(), name, emoji });
+  await loadCategories();
+  document.getElementById('cat-name').value = '';
+  document.getElementById('cat-emoji').value = '';
+  showToast('✅ Categoría creada');
+}
+
+async function deleteCategory(id) {
+  if(!confirm('¿Eliminar esta categoría?')) return;
+  if(sb) await sb.from('categories').delete().eq('id', id);
+  else categories = categories.filter(c=>c.id!=id);
+  await loadCategories();
+  showToast('🗑️ Categoría eliminada');
+}
+
+/* ---- BANNERS ---- */
+function renderAdminBannerList() {
+  const list = document.getElementById('admin-banner-list');
+  if(!list) return;
+  list.innerHTML = bannersData.map(b => `
+    <div class="admin-list-item">
+      <div class="admin-item-img">🖼️</div>
+      <div class="admin-item-info">
+        <strong>${b.title||''}</strong>
+        <small>${b.tag||''}</small>
+      </div>
+      <div class="admin-item-actions">
+        <button class="btn-danger" onclick="deleteBanner('${b.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function saveBanner() {
+  const tag   = document.getElementById('bn-tag').value.trim();
+  const title = document.getElementById('bn-title').value.trim();
+  const sub   = document.getElementById('bn-sub').value.trim();
+  const color = document.getElementById('bn-color').value.trim() || 'linear-gradient(135deg,#1a6b3c,#0d4525)';
+  if(!title) { showToast('El título es obligatorio'); return; }
+  if(sb) await sb.from('banners').insert({ tag, title, sub, color });
+  else bannersData.push({ id:'l'+Date.now(), tag, title, sub, color });
+  await loadBanners();
+  ['bn-tag','bn-title','bn-sub','bn-color'].forEach(i => document.getElementById(i).value='');
+  showToast('✅ Banner guardado');
+}
+
+async function deleteBanner(id) {
+  if(!confirm('¿Eliminar este banner?')) return;
+  if(sb) await sb.from('banners').delete().eq('id', id);
+  else bannersData = bannersData.filter(b=>b.id!=id);
+  await loadBanners();
+  showToast('🗑️ Banner eliminado');
+}
+
+/* ---- GALLERY ---- */
+function previewGalleryImg(input) {
+  const preview = document.getElementById('gallery-preview');
+  if(input.files && input.files[0]) {
+    const r = new FileReader();
+    r.onload = e => { preview.innerHTML = `<img src="${e.target.result}" alt="preview">`; };
+    r.readAsDataURL(input.files[0]);
+  }
+}
+
+async function saveGalleryPhoto() {
+  const file = document.getElementById('gallery-img').files[0];
+  const desc = document.getElementById('gallery-desc').value.trim();
+  if(!file) { showToast('Selecciona una foto'); return; }
+  const btn = document.getElementById('save-gallery-btn');
+  btn.innerHTML = '<span class="uploading-spinner"></span>Subiendo…';
+  btn.disabled = true;
+
+  let img_url = '';
+  if(sb) {
+    const ext  = file.name.split('.').pop();
+    const path = `gallery/${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from('images').upload(path, file, { upsert:true, contentType: file.type });
+    if(!error) {
+      const { data } = sb.storage.from('images').getPublicUrl(path);
+      img_url = data.publicUrl;
+      await sb.from('gallery').insert({ img_url, description: desc });
+    }
+  }
+
+  await loadGallery();
+  document.getElementById('gallery-img').value = '';
+  document.getElementById('gallery-desc').value = '';
+  document.getElementById('gallery-preview').innerHTML = '<span>Sin imagen seleccionada</span>';
+  showToast('📸 Foto subida a la galería');
+  btn.innerHTML = '📤 Subir Foto';
+  btn.disabled = false;
+}
+
+function renderAdminGalleryList() {
+  const list = document.getElementById('admin-gallery-list');
+  if(!list) return;
+  if(!galleryData.length) { list.innerHTML = '<p style="color:var(--gris);font-size:13px;grid-column:1/-1">No hay fotos en la galería aún.</p>'; return; }
+  list.innerHTML = galleryData.map(g => `
+    <div class="product-card" style="cursor:default">
+      <div class="product-img-wrap">
+        <img src="${g.img_url}" alt="${g.description||''}" loading="lazy">
+      </div>
+      <div class="product-info">
+        <div class="product-name" style="font-size:12px">${g.description||'Sin descripción'}</div>
+      </div>
+      <div class="product-footer">
+        <button class="btn-danger" style="width:100%;justify-content:center" onclick="deleteGalleryPhoto('${g.id}')">🗑️ Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+async function deleteGalleryPhoto(id) {
+  if(!confirm('¿Eliminar esta foto?')) return;
+  if(sb) await sb.from('gallery').delete().eq('id', id);
+  else galleryData = galleryData.filter(g=>g.id!=id);
+  await loadGallery();
+  showToast('🗑️ Foto eliminada');
+}
+</script>
+</body>
+</html>
 
