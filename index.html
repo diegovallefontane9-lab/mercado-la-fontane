@@ -904,8 +904,8 @@ footer a { color: var(--dorado); }
 /* ============================================================
    CONFIGURACIÓN — EDITA ESTOS VALORES
    ============================================================ */
-const SUPABASE_URL  = 'https://TU_PROYECTO.supabase.co';    // ← Reemplaza
-const SUPABASE_KEY  = 'TU_ANON_KEY_AQUI';                   // ← Reemplaza
+const SUPABASE_URL  = 'https://oimzynthjxmywlefxifw.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pbXp5bnRoanhteXdsZWZ4aWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDY3MzUsImV4cCI6MjA5MDQ4MjczNX0.RMfWAsaE4KK-MN3uizfmDBmABCshE7orEsMkMst2ruQ';
 const ADMIN_PASS_DEFAULT = 'ludmila80';
 let ADMIN_PASS = localStorage.getItem('admin_pass_fontane') || ADMIN_PASS_DEFAULT;
 const WA_NUMBER     = '5359382320';
@@ -1375,6 +1375,9 @@ function changeAdminPass() {
   document.getElementById('pass-confirm').value = '';
   showToast('✅ Contraseña actualizada correctamente');
 }
+
+/* ============================================================
+   ACCESO ADMIN (5 toques al logo)
    ============================================================ */
 let logoTaps = 0, logoTimer = null;
 function handleLogoTap() {
